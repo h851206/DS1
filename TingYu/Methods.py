@@ -1,6 +1,21 @@
-import measurement_table
+from TingYu import measurement_table
 import pandas as pd
 
+
+def combine_raw_data(
+        data_red_dir: str, data_white_dir: str
+) -> (pd.DataFrame, pd.DataFrame):
+    data_white = pd.read_csv(data_white_dir)
+    data_red = pd.read_csv(data_red_dir)
+
+    data_white['wine_class'] = -1
+    data_red['wine_class'] = 1
+
+    data = pd.concat([data_red, data_white], ignore_index=True)
+    count0 = pd.DataFrame()
+    count0['quality'] = data['quality']
+    count0['method'] = 'imbalance dataset'
+    return data, count0
 
 def imbalance(data):
     X_train, y_train, X_test, y_test = measurement_table.train_test(data)
@@ -8,9 +23,9 @@ def imbalance(data):
     df1_plot = measurement_table.transform(df1)
     return acc1, df1_plot, train_df1, AUC1
 
-def RS_Kmean(data):
+def RS_Kmean(data, n_clusters):
     X_train, y_train, X_test, y_test = measurement_table.train_test(data)
-    X_train = measurement_table.clustering(X_train, 6)
+    X_train = measurement_table.clustering(X_train, n_clusters=n_clusters)
     X_train['index'] = X_train.index
     kmean_y_train = X_train['kmeans_label']
     X_train_miss, y_train_miss = measurement_table.undersampling(X_train, kmean_y_train)
@@ -33,9 +48,10 @@ def RS(data):
     df3_plot = measurement_table.transform(df3)
     return acc3, df3_plot, train_df3, AUC3
 
-def n_near_Kmean(data, n):
+def n_near_Kmean(data, n_clusters, n_neighbour):
     X_train, y_train, X_test, y_test = measurement_table.train_test(data)
-    X_train_neighbor, y_train_neighbor = measurement_table.N_neighbor(X_train, y_train, 6, n)
+    X_train_neighbor, y_train_neighbor = measurement_table.N_neighbor(X_train, y_train,
+                                                                      n_clusters=n_clusters, n_neighbor=n_neighbour)
     count3 = pd.DataFrame()
     count3['quality'] = y_train
     count3['method'] = 'Top N neighbors and Kmean++'
@@ -43,9 +59,9 @@ def n_near_Kmean(data, n):
     df4_plot = measurement_table.transform(df4)
     return acc4, df4_plot, train_df4, AUC4
 
-def centroid_Kmean(data):
+def centroid_Kmean(data, n_clusters):
     X_train, y_train, X_test, y_test = measurement_table.train_test(data)
-    X_train, y_train, y_test = measurement_table.centroid(X_train, X_test, 7)
+    X_train, y_train, y_test = measurement_table.centroid(X_train, X_test, n_clusters=n_clusters)
     count5 = pd.DataFrame()
     count5['quality'] = y_train+3
     count5['method'] = 'centroid'

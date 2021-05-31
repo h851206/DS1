@@ -13,21 +13,6 @@ import seaborn as sns
 import ptitprince as pt
 from sklearn import metrics
 
-def combine_raw_data(
-        data_red_dir: pd.DataFrame, data_white_dir: pd.DataFrame
-) -> (pd.DataFrame, pd.DataFrame):
-    data_white = pd.read_csv(data_white_dir)
-    data_red = pd.read_csv(data_red_dir)
-
-    data_white['wine_class'] = -1
-    data_red['wine_class'] = 1
-
-    data = pd.concat([data_red, data_white], ignore_index=True)
-    count0 = pd.DataFrame()
-    count0['quality'] = data['quality']
-    count0['method'] = 'imbalance dataset'
-    return data, count0
-
 
 def accuracy(y_test, y_predict):
     count = 0
